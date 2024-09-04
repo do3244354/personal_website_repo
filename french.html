@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+<head>
+<title>Dorothée Grondin</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width+device-width, initial-scale=1">
+<style>
+
+body{
+	font-family: Helvetica;
+}
+.header{
+	padding: 40px;
+	text-align: center;
+	background: lightblue;
+	color: black;
+}
+img{
+	max-width: 100%;
+	max-height: 100%;
+
+}
+
+.center{
+	display: block;
+	margin: 0 auto;
+	width: 583px;
+	height: 417px; 
+}
+
+.paragraph{
+	padding: 40px;
+	background: white;
+	color: black;
+}
+.header h3{
+	font-size: 30px;
+	text-align: center;
+}
+.navbar{
+	overflow: hidden;
+	background-color: #100;
+}
+.navbar a{
+	float: left;
+	display: block;
+	color: white;
+	text-align:center;
+	padding: 14px 20px;
+	text-decoration: none;
+}
+
+.navbar a.right{
+	float: right;
+}
+
+.navbar a.left{
+	float: left;
+}
+
+.navbar a:hover{
+	background-color: #ddd;
+	color: black;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+.row{
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.main{
+	flex: 70%;
+	background-color: white;
+	padding: 20px;
+}
+
+@media screen and (max-width: 700px){
+	.row{
+		flex-direction: column;
+	}
+}
+
+@media screen and (max-width: 400px){
+	.navbar a{
+		float: none;
+		width: 100%;
+	}
+}
+
+.footer {
+	padding: 20px;
+	background: #ddd;
+	background-color: #100;
+	color: white;
+}
+
+</style>
+</head>
+<body>
+<div class="header">
+	<h2>Dorothée Grondin</h2>
+	<p>Je suis une étudiante au baccalauréat en mathématiques et informatique à l'Université Laval. Je suis passionnée par les mathématiques et j'aime beaucoup la programmation. J'ai créé ce site pour rendre mes projets accessibles facilement. Je suis principalement interéssée par les mathématiques pures car j'adore écrire des preuves. Je suis surtout interéssée par l'analyse mais l'algèbre m'intéresse aussi. J'aime aussi les maths plus appliquées et j'aime en apprendre sur la programmation et la physique.
+	</p>
+</div>
+
+<div class="navbar">
+	<a href=".\french.html">Accueil</a>
+	<a href=".\projects_french.html">Projets</a>
+	<a href=".\index.html" class="right">English</a>
+</div>
+
+<div class="paragraph">
+	<h2>Recent projects</h2>
+	<h3>Triangulation Software</h3>
+	<p>Je travaille présentement sur un logiciel permettant de trianguler différentes sortes de surfaces et d'intéragir et faire des calculs sur ces surfaces triangulées. Le projet est écrit en Python et utilise Gtk pour son interface graphique.
+	</p>
+	<div class = "center">
+		<img src="TriangulationSoftware2.jpg" alt="Triangulation Software" style="width:700px;height:500px;">
+	</div>
+	<p>Link to the GitHub page: Put link here</p>
+
+	<h3>Galois Theory Presentation</h3>
+	<p>J'ai été vraiment surprise quand j'ai appris qu'il n'existe pas de formule permettant de trouver les racines de n'importe quels polynôme de degré 5. Cela m'a encouragé à étudier la Théorie de Galois afin de vraiment comprendre pourquoi une telle formule est impossible. Je travaille sur une présentation accessible au étudiants du CÉGEP qui explique en détail tous les éléments de la preuve.  
+	</p>
+	<div class = "center">
+		<img src="GaloisTheory.jpg" alt="Galois Theory Presentation" style="width:700px;height:500px;">
+	</div>
+	<p align="left"><a href="main.pdf" class="left">Présentation sur la Théorie de Galois (Version française)</a></p>
+</div>
+
+<div class="footer">
+	<h3>Contact</h3>
+	<p>Email: Put email here</p>
+	<p>Page mise à jour le: 2024-08-29</p>
+
+</div>
+
+</body>
+</html>
