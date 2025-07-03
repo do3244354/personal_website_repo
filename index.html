@@ -5,6 +5,16 @@
 <title>Dorothée Grondin</title>
 <script src="https://cdn.jsdelivr.net/npm/p5@1.11.5/lib/p5.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/addons/p5.sound.min.js"></script>
+<script src="https://sagecell.sagemath.org/static/embedded_sagecell.js"></script>
+    <script>
+    // Make the div with id 'mycell' a Sage cell
+    sagecell.makeSagecell({inputLocation:  '#mycell',
+                           template:       sagecell.templates.minimal,
+                           evalButtonText: 'Activate'});
+    // Make *any* div with class 'compute' a Sage cell
+    sagecell.makeSagecell({inputLocation: 'div.compute',
+                           evalButtonText: 'Evaluate'});
+    </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width+device-width, initial-scale=1">
 <style>
@@ -125,6 +135,17 @@ img{
     </div>
     
 	<p>Link to my GitHub page: <a href="https://github.com/do3244354/TriangulationSoftware" class="left">https://github.com/do3244354/TriangulationSoftware</a></p>
+
+
+	<h3>Embedded Sage Cell</h3>
+  	Click the “Activate” button below to calculate factorials.
+	<div id="mycell"><script type="text/x-sage">
+@interact
+def _(a=(1, 10)):
+  		print(factorial(a))
+  		print("this function is doing something")
+	</script>
+	</div>
 
 	<h3>Galois Theory Presentation</h3>
 	<p>I was really surprised when I learned that there does not exist a formula allowing one to find the roots of any fifth degree polynomial. This encouraged me to study Galois Theory to really understand why such a formula is impossible. I am currently working on a presentation accessible to preuniversity students. The presentation is currently only available in French but an English version is coming soon.</p>
