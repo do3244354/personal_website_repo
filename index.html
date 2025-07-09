@@ -137,21 +137,62 @@ img{
 	<p>Link to my GitHub page: <a href="https://github.com/do3244354/TriangulationSoftware" class="left">https://github.com/do3244354/TriangulationSoftware</a></p>
 
 
-	<h3>Embedded Sage Cell</h3>
-  	Click the “Activate” button below to calculate factorials.
+	<h3>SIDH Key Exchange</h3>
 	<div id="mycell"><script type="text/x-sage">
-@interact
-def _(a=(1, 10)):
-  		print(factorial(a))
-  		print("this function is doing something")
+import random
+
+a = 4
+b = 3
+p = 2^a*3^b-1
+
+Fp2.<i> = GF(p**2, modulus=x**2+1)
+assert i^2 == -1
+R.<x> = PolynomialRing(Fp2)
+E_start = EllipticCurve(Fp2, [0,6,0,1,0])
+
+sk_a = random.randint(0, 2^a)
+sk_b = random.randint(0, 3^b)
+
+a_torsion = E_start.torsion_basis(2^a)
+b_torsion = E_start.torsion_basis(3^b)
+
+cyclic_gen_a = a_torsion[0] + sk_a*a_torsion[1]
+cyclic_gen_b = b_torsion[0] + sk_b*b_torsion[1]
+
+#input: E (the starting curve), S (the n^l cyclic subgroup generator), l (216 or 137), n (2 or 3)
+#output: the n^l isogeny phi
+def isogeny_from_kernel(E, S, l, n):
+
+    phi = EllipticCurveIsogeny(E, E(0))
+    for i in range(l):
+       
+        l_torsion_gen = phi((n^(l-i-1))*S)
+        
+        phi = EllipticCurveIsogeny(phi.codomain(E), l_torsion_gen)*phi
+    return phi
+
+phi_alice = isogeny_from_kernel(E_start, cyclic_gen_a, a, 2)
+phi_bob = isogeny_from_kernel(E_start, cyclic_gen_b, b, 3)
+
+cyclic_gen_image_b = phi_bob(a_torsion[0]) + sk_a*phi_bob(a_torsion[1])
+cyclic_gen_image_a = phi_alice(b_torsion[0]) + sk_b*phi_alice(b_torsion[1])
+
+final_isogeny_alice = isogeny_from_kernel(phi_bob.codomain(E_start), cyclic_gen_image_b, 216, 2)
+final_isogeny_bob = isogeny_from_kernel(phi_alice.codomain(E_start), cyclic_gen_image_a, 137, 3)
+
+print(phi_alice.codomain(E_start))
+print(final_isogeny_alice.codomain(phi_bob.codomain(E_start)))
+print(final_isogeny_alice.codomain(phi_bob.codomain(E_start)).j_invariant())
+
+print(phi_bob.codomain(E_start))
+print(final_isogeny_bob.codomain(phi_alice.codomain(E_start)))
+print(final_isogeny_bob.codomain(phi_alice.codomain(E_start)).j_invariant())
+
 	</script>
 	</div>
 
 	<h3>Galois Theory Presentation</h3>
 	<p>I was really surprised when I learned that there does not exist a formula allowing one to find the roots of any fifth degree polynomial. This encouraged me to study Galois Theory to really understand why such a formula is impossible. I am currently working on a presentation accessible to preuniversity students. The presentation is currently only available in French but an English version is coming soon.</p>
-	<div class = "center">
-		<img src="GaloisTheory.jpg" alt="Galois Theory Presentation" style="width:700px;height:500px;">
-	</div>
 	<p align="left"><a href="main.pdf" class="left">Galois Theory Presentation (French version)</a></p>
 </div>
 
