@@ -4,7 +4,51 @@ let radius = 100;
 let WIDTH = 600;
 let HEIGHT = 400;
 
+//we define a dictionnary with all the info in it
+let self_curves = {
+  sides: {
+    points: [],
+    lines: [],
+    index: [],
+    calculation_lines: {
+      lines: [],
+      index: [],
+    },
+  },
+  punctures: {
+    points: [],
+    index: [],
+    overlap_one: null,
+    pressed_two: null,
+  },
+  components: {
+    center: [],
+    points: [],
+    number_points: [],
+    index: [],
+    calculation_lines: {
+      lines: [],
+      index: [],
+    },
+    overlap_one: null,
+    pressed_two: null,
+  },
+  diagonals: {
+    points: [],
+    index: [],
+    midpoints: [],
+    calculation_lines: {
+      lines: [],
+      index: [],
+    },
+    overlap_one: null,
+    pressed_two: null,
+  },
+};
+
 //list to store the circle's centers
+//we will need a list for the points, lines, and components
+//we will need the bezier curve algorithm
 puncture_list = []
 //variable to store the overlapped value
 overlapped = null
@@ -19,40 +63,68 @@ function setup() {
 
 function draw() {
   update_interface();
+  puncture_list = self_curves["punctures"]["points"]
   //just a small test
   if ((40 < mouseY && mouseY < 360) && (mouseIsPressed == true)){
     ellipse(mouseX, mouseY,15,15);
   };
-  for (i = 0; i < puncture_list.length ; i++){
+  
+  //we draw the points
+  for (i = 0; i < self_curves["punctures"]["points"].length ; i++){
     fill("red")
     stroke("red")
-    ellipse(WIDTH/2+puncture_list[i][0]*HEIGHT, HEIGHT/2+puncture_list[i][1]*HEIGHT, 8, 8)
-    if (overlapped == i){
+    ellipse(WIDTH/2+self_curves["punctures"]["points"][i][0]*HEIGHT, HEIGHT/2+self_curves["punctures"]["points"][i][1]*HEIGHT, 8, 8)
+    if (self_curves["punctures"]["overlap_one"] == i){
       fill("#B31F1E")
       stroke("#B31F1E")
-      ellipse(WIDTH/2+puncture_list[i][0]*HEIGHT, HEIGHT/2+puncture_list[i][1]*HEIGHT, 8, 8)
+      ellipse(WIDTH/2+self_curves["punctures"]["points"][i][0]*HEIGHT, HEIGHT/2+self_curves["punctures"]["points"][i][1]*HEIGHT, 8, 8)
     }
-    if (clicked == i){
+    if (self_curves["punctures"]["pressed_two"] == i){
       fill("#B31F1E")
       stroke("#B31F1E")
-      ellipse(WIDTH/2+puncture_list[i][0]*HEIGHT, HEIGHT/2+puncture_list[i][1]*HEIGHT, 12, 12)
+      ellipse(WIDTH/2+self_curves["punctures"]["points"][i][0]*HEIGHT, HEIGHT/2+self_curves["punctures"]["points"][i][1]*HEIGHT, 10, 10)
     }
   }
+  
+  //we draw the components
+  for (i = 0; i < self_curves["components"]["center"].length; i++){
+    fill(220)
+    stroke("black")
+    ellipse(WIDTH/2+self_curves["components"]["center"][i][0]*HEIGHT,
+           HEIGHT/2+self_curves["components"]["center"][i][1]*HEIGHT,
+           40, 40)
+    if (self_curves["components"]["overlap_one"] == i){
+      fill(220)
+      stroke("blue")
+      ellipse(WIDTH/2+self_curves["components"]["center"][i][0]*HEIGHT, HEIGHT/2+self_curves["components"]["center"][i][1]*HEIGHT, 40, 40)
+    }
+    if (self_curves["components"]["pressed_two"] == i){
+      fill(220)
+      stroke("blue")
+      ellipse(WIDTH/2+self_curves["components"]["center"][i][0]*HEIGHT, HEIGHT/2+self_curves["components"]["center"][i][1]*HEIGHT, 41, 41)
+    }
+    //we add points around the components
+    point_around_circle(self_curves["components"]["number_points"][i], WIDTH/2 + self_curves["components"]["center"][i][0]*HEIGHT, HEIGHT/2 + self_curves["components"]["center"][i][1]*HEIGHT, 20, false)
+  }
+  
   side = SideEntry.value();
-  point_around_circle(side);
+  point_around_circle(side, WIDTH/2, HEIGHT/2, radius, true);
 }
 
-function point_around_circle(n) {
+function point_around_circle(n, center_x, center_y, radius_circle, is_main_circle) {
   if (n <= 20) {
-    for (i=0 ; i < n; i++){
-      stroke(20);
-      line(300 + radius*Math.cos((i-1)*(2*pi)/n), 200 + radius*Math.sin((i-1)*(2*pi)/n), 300 + radius*Math.cos(i*(2*pi)/n), 200 + radius*Math.sin(i*(2*pi)/n));
+    if (is_main_circle == true){
+      for (j=0 ; j < n; j++){
+        stroke(20);
+        line(center_x + radius_circle*Math.cos((j-1)*(2*pi)/n), center_y + radius_circle*Math.sin((j-1)*(2*pi)/n), center_x + radius_circle*Math.cos(j*(2*pi)/n), center_y + radius_circle*Math.sin(j*(2*pi)/n));
+    }
   }
-    for (i=0 ; i < n; i++){
+    for (j=0 ; j < n; j++){
       fill("red")
       stroke("red")
-      ellipse(300 + radius*Math.cos(i*(2*pi)/n), 200 + radius*Math.sin(i*(2*pi)/n), 8, 8);
+      ellipse(center_x + radius_circle*Math.cos(j*(2*pi)/n), center_y + radius_circle*Math.sin(j*(2*pi)/n), 8, 8);    
   }
+  
 }
 }
 
@@ -96,6 +168,7 @@ function draw_interface() {
   //ComponentButton.position(355, 375);
   ComponentButton.position(290, -30, "relative");
   ComponentButton.size(25,20);
+  ComponentButton.mousePressed(addComponent)
   
   DoneButton = createButton("Done");
   DoneButton.parent("sketch-container");
@@ -121,61 +194,146 @@ function update_interface(){
 }
 
 function mouseMoved(){
+  //we verify if a puncture has been overlapped
   counter = 0; 
   is_clicked = false;
-  for (i = 0; i < puncture_list.length; i++){
-    if (dist(mouseX, mouseY, WIDTH/2+puncture_list[i][0]*HEIGHT, HEIGHT/2+puncture_list[i][1]*HEIGHT) < 0.009*HEIGHT){
-      overlapped = i;
+  for (i = 0; i < self_curves["punctures"]["points"].length; i++){
+    if (dist(mouseX, mouseY, WIDTH/2+self_curves["punctures"]["points"][i][0]*HEIGHT, HEIGHT/2+self_curves["punctures"]["points"][i][1]*HEIGHT) < 0.009*HEIGHT){
+      //overlapped = i;
+      self_curves["punctures"]["overlap_one"] = i;
       if (mouseIsPressed == true){
         clicked = i;
+        self_curves["punctures"]["pressed_two"] = i
         is_clicked = true;
       }
     }
     else{
       counter += 1
     }  
-  if (counter == puncture_list.length){
-      overlapped = null;
+  if (counter == self_curves["punctures"]["points"].length){
+      //overlapped = null;
+      self_curves["punctures"]["overlap_one"] = null
   }
   if (is_clicked == false){
       clicked = null;
+      self_curves["punctures"]["pressed_two"] = null
   }
   }
-  //if (clicked != null){
-    //puncture_list[clicked][0] = (movedX - WIDTH/2)/(HEIGHT);
-    //puncture_list[clicked][1] = (movedY - HEIGHT/2)/(HEIGHT);
-  //}
+  
+  //we verify if a component has been overlapped
+  counter = 0; 
+  is_clicked = false;
+  for (i = 0; i < self_curves["components"]["center"].length; i++){
+    if (dist(mouseX, mouseY, WIDTH/2+self_curves["components"]["center"][i][0]*HEIGHT, HEIGHT/2+self_curves["components"]["center"][i][1]*HEIGHT) < 0.050*HEIGHT){
+      //overlapped = i;
+      self_curves["components"]["overlap_one"] = i;
+      if (mouseIsPressed == true){
+        clicked = i;
+        self_curves["components"]["pressed_two"] = i
+        is_clicked = true;
+      }
+    }
+    else{
+      counter += 1
+    }  
+  if (counter == self_curves["components"]["center"].length){
+      //overlapped = null;
+      self_curves["components"]["overlap_one"] = null
+  }
+  if (is_clicked == false){
+      clicked = null;
+      self_curves["components"]["pressed_two"] = null
+  }
+  }
+  
+  
 }
 
 function mousePressed(){
+  //we verify if a puncture have been pressed
   is_clicked = false;
-  for (i = 0; i < puncture_list.length; i++){
-    if (dist(mouseX, mouseY, WIDTH/2+puncture_list[i][0]*HEIGHT, HEIGHT/2+puncture_list[i][1]*HEIGHT) < 0.009*HEIGHT){
-      clicked = i;
+  for (i = 0; i < self_curves["punctures"]["points"].length; i++){
+    if (dist(mouseX, mouseY, WIDTH/2+self_curves["punctures"]["points"][i][0]*HEIGHT, HEIGHT/2+self_curves["punctures"]["points"][i][1]*HEIGHT) < 0.009*HEIGHT){
+      //clicked = i;
+      self_curves["punctures"]["pressed_two"] = i;
       is_clicked = true;
     }
   if (is_clicked == false){
-      clicked = null;
+      //clicked = null;
+      self_curves["punctures"]["pressed_two"] = null
+    }
+  }
+  
+  //we verify if a component have been pressed
+  is_clicked = false;
+  for (i = 0; i < self_curves["components"]["center"].length; i++){
+    if (dist(mouseX, mouseY, WIDTH/2+self_curves["components"]["center"][i][0]*HEIGHT, HEIGHT/2+self_curves["components"]["center"][i][1]*HEIGHT) < 0.050*HEIGHT){
+      //clicked = i;
+      self_curves["components"]["pressed_two"] = i;
+      is_clicked = true;
+    }
+  if (is_clicked == false){
+      //clicked = null;
+      self_curves["components"]["pressed_two"] = null
     }
   }
 }
 
 function mouseReleased(){
-  clicked = null;
-}
-
-function addPuncture(){
-  puncture_list.push([0, 0])
+  //clicked = null;
+  self_curves["punctures"]["pressed_two"] = null
+  self_curves["components"]["pressed_two"] = null
 }
 
 function mouseDragged(){
-  if (clicked != null){
-    print(WIDTH/2)
-    print(HEIGHT)
-    print((mouseX - WIDTH/2)/(HEIGHT))
+  //we verify if we are moving a puncture around
+  if (self_curves["punctures"]["pressed_two"] != null){
     if (40 < mouseY && mouseY < 360){
-      puncture_list[clicked][0] = (mouseX - WIDTH/2)/(HEIGHT)
-      puncture_list[clicked][1] = (mouseY - HEIGHT/2)/(HEIGHT)
+      clicked = self_curves["punctures"]["pressed_two"]
+      //puncture_list[clicked][0] = (mouseX - WIDTH/2)/(HEIGHT)
+      //puncture_list[clicked][1] = (mouseY - HEIGHT/2)/(HEIGHT)
+      self_curves["punctures"]["points"][clicked][0] = (mouseX - WIDTH/2)/(HEIGHT)
+      self_curves["punctures"]["points"][clicked][1] = (mouseY - HEIGHT/2)/(HEIGHT)
     }
   }
+  
+  //we verify if we are moving a puncture around
+  if (self_curves["components"]["pressed_two"] != null){
+    if (40 < mouseY && mouseY < 360){
+      clicked = self_curves["components"]["pressed_two"]
+      //puncture_list[clicked][0] = (mouseX - WIDTH/2)/(HEIGHT)
+      //puncture_list[clicked][1] = (mouseY - HEIGHT/2)/(HEIGHT)
+      self_curves["components"]["center"][clicked][0] = (mouseX - WIDTH/2)/(HEIGHT)
+      self_curves["components"]["center"][clicked][1] = (mouseY - HEIGHT/2)/(HEIGHT)
+    }
+  }
+}
+
+function addPuncture(){
+  //puncture_list.push([0, 0])
+  self_curves["punctures"]["points"].push([0, 0])
+}
+
+function addComponent(){
+  //puncture_list.push([0, 0])
+  print("hello")
+  self_curves["components"]["center"].push([0, 0])
+  self_curves["components"]["number_points"].push(0)
+}
+
+function keyPressed(){
+  //add points to a component
+  if ((key == "p") && (self_curves["components"]["overlap_one"] != null)){
+    clicked = self_curves["components"]["overlap_one"] 
+    if (self_curves["components"]["number_points"][clicked]<10){
+      self_curves["components"]["number_points"][clicked] += 1
+    }
+  }
+  if ((key == "o") && (self_curves["components"]["overlap_one"] != null)){
+    clicked = self_curves["components"]["overlap_one"]
+    if (self_curves["components"]["number_points"][clicked]>0){
+      self_curves["components"]["number_points"][clicked] -= 1
+    }
+  }
+  print(self_curves["components"])
 }
