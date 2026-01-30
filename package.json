@@ -1,0 +1,12 @@
+{
+  "name": "personal_website_repo",
+  "version": "1.0.0",
+  "description": "This is my personal website related to mathematics and computer science",
+  "main": "sketch.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
