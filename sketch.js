@@ -1,3 +1,7 @@
+const geometry = require('geometry');
+
+//console.log((geometry.getRandomColor()).name);
+
 let pi = 3.141592654;
 let radius = 100;
 
